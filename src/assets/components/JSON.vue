@@ -90,6 +90,17 @@
     <section class="lab-section">
       <h2>Attribute, Class and Style Binding with <code>v-bind</code></h2>
       <p>Highlighting Specific Authors:</p>
+      <ul>
+        <li 
+          v-for="author in authors" 
+          :key="author.id"
+          :class="{ 'highlight': author.name === 'George Orwell' }"
+          :style="author.name === 'George Orwell' ? { color: 'red', fontWeight: 'bolder', fontSize: '20px' } : {}"
+        >
+          {{ author.name }} ({{ author.birthYear }})
+          <span v-if="author.name === 'George Orwell'" class="special-badge"></span>
+        </li>
+      </ul>
 
     </section>
   </div>
