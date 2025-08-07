@@ -39,7 +39,11 @@
       <h3>Nested Arrays/Objects</h3>
       <p>{{ austen?.name }}'s works:</p>
       <!-- Activity 9: Render a list of Austen's works. Hint: Use the v-for directive to iterate through the array of authors that you have filtered out. -->
-      <!-- TODO: CODE TO RENDER LIST OF AUSTEN'S WORKS HERE -->
+      <ul v-if="austen">
+        <li v-for="work in austen.famousWorks" :key="work.title">
+          {{ work.title }} ({{ work.year }})
+        </li>
+      </ul>
     </section>
 
     <section class="lab-section">
@@ -48,15 +52,11 @@
 
       <h3>Accessing Properties</h3>
       <p>
-        Company:
-        <!-- Activity 9a: Get the company name from the bookstores object. -->
-        <!-- TODO: CODE TO GET COMPANY NAME HERE -->
+        Company: {{ bookstores.name }}
       </p>
 
       <p>
-        Total Stores:
-        <!-- Activity 9b: Get the total number of stores from the bookstores object. -->
-        <!-- TODO: CODE TO GET TOTAL STORES HERE -->
+        Total Stores: {{ bookstores.totalStores }}
       </p>
 
       <h3>Iterating Object Properties</h3>
@@ -118,12 +118,12 @@ const allFamousWorks = computed(() =>
 
 // Activity 4: Find author by name
 const orwell = computed(() => {
-  // TODO: CODE TO FIND AUTHOR BY NAME HERE
+  return authors.find(author => author.name === "George Orwell")
 })
 
 // Activity 5: Find author by ID
 const austen = computed(() => {
-  // TODO: CODE TO FIND AUTHOR BY ID HERE
+  return authors.find(author => author.id === 1)
 })
 </script>
 
