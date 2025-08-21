@@ -7,32 +7,51 @@
                     <div class="row mb-3">
                         <div class="col-md-6 col-sm-6 col-6">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" v-model="formData.username">
+                            <input type="text" class="form-control" id="username" 
+                            @blur="validateName(true)"
+                            @input="validateName(false)"
+                            v-model="formData.username">
+                            <div  v-if="errors.username" class="text-danger">{{ errors.username }}</div>
                         </div>
                         <div class="col-md-6 col-sm-6 col-6">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" v-model="formData.password">
+                            <input type="password" class="form-control" id="password" 
+                            @blur="validatePassword(true)"
+                            @input="validatePassword(false)"
+                            v-model="formData.password">
+                            <div v-if="errors.password" class="text-danger">{{ errors.password }}</div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6 col-sm-6 col-6">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="isAustralian" v-model="formData.isAustralian">
+                                <input type="checkbox" class="form-check-input" id="isAustralian" 
+                                @change="validateAustralian(true)"
+                                v-model="formData.isAustralian">
                                 <label class="form-check-label" for="isAustralian">Australian Resident?</label>
                             </div>
+                            <div v-if="errors.isAustralian" class="text-danger">{{ errors.isAustralian }}</div>
                         </div>
                         <div class="col-md-6 col-sm-6 col-6">
                             <label for="gender" class="form-label">Gender</label>
-                            <select class="form-select" id="gender" v-model="formData.gender">
+                            <select class="form-select" id="gender" 
+                            @blur="validateGender(true)"
+                            @change="validateGender(false)"
+                            v-model="formData.gender">
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
                             </select>
+                            <div v-if="errors.gender" class="text-danger">{{ errors.gender }}</div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="reason" class="form-label">Reason for joining</label>
-                        <textarea class="form-control"  id="reason" rows="3" v-model="formData.reason"></textarea>
+                        <textarea class="form-control"  id="reason" rows="3" 
+                        @blur="validateReason(true)"
+                        @input="validateReason(false)"
+                        v-model="formData.reason"></textarea>
+                        <div v-if="errors.reason" class="text-danger">{{ errors.reason }}</div>
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary me-2">Submit</button>
@@ -83,9 +102,17 @@ const formData = ref({
 const submittedCards = ref([]);
 
 const submitForm = () => {
-    submittedCards.value.push({
-        ...formData.value
-    });
+    validateName(true);
+    validatePassword(true);
+    validateAustralian(true);
+    validateGender(true);
+    validateReason(true);
+
+    if (!errors.value.username && !errors.value.password && !errors.value.isAustralian && !errors.value.gender && !errors.value.reason) {
+        submittedCards.value.push({ ...formData.value });
+        clearForm();
+    }
+
 };
 
 const clearForm = () => {
@@ -97,6 +124,85 @@ const clearForm = () => {
         gender: ''
     };
 };
+
+const errors = ref({
+    username: null,
+    password: null,
+    isAustralian: null,
+    gender: null,
+    reason: null
+});
+
+const validateName=(blur)=>{
+    if(formData.value.username.length < 3){
+        if(blur)errors.value.username = "Name must be at least 3 characters";
+    } else {
+        errors.value.username = null;
+    }
+}
+
+const validatePassword = (blur) => {
+    const password = formData.value.password;
+    
+    if (password.length < 8) {
+        if (blur) errors.value.password = "Password must be at least 8 characters";
+        return;
+    }
+    
+    if (!/[a-z]/.test(password)) {
+        if (blur) errors.value.password = "Password must contain at least one lowercase letter";
+        return;
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+        if (blur) errors.value.password = "Password must contain at least one uppercase letter";
+        return;
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        if (blur) errors.value.password = "Password must contain at least one special character";
+        return;
+    }
+
+    errors.value.password = null;
+}
+
+const validateAustralian = (blur) => {
+    if (!formData.value.isAustralian) {
+        if (blur) errors.value.isAustralian = "Please confirm your Australian residency status";
+    } else {
+        errors.value.isAustralian = null;
+    }
+}
+
+const validateGender = (blur) => {
+    if (!formData.value.gender) {
+        if (blur) errors.value.gender = "Please select your gender";
+    } else {
+        errors.value.gender = null;
+    }
+}
+
+const validateReason = (blur) => {
+    const reason = formData.value.reason.trim();
+    
+    if (!reason) {
+        if (blur) errors.value.reason = "Reason for joining is required";
+        return;
+    }
+    
+    if (reason.length < 10) {
+        if (blur) errors.value.reason = "Reason must be at least 10 characters";
+        return;
+    }
+    
+    if (reason.length > 200) {
+        if (blur) errors.value.reason = "Reason must not exceed 200 characters";
+        return;
+    }
+    
+    errors.value.reason = null;
+}
 </script>
 
 <style scoped>
