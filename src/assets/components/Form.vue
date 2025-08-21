@@ -60,26 +60,18 @@
                 </form>
 
 
-                    <div class="row mt-5" v-if="submittedCards.length">
-                    <div class="col-12">
-                        <div class="row g-3">
-                            <div v-for="(card, index) in submittedCards" :key="index" 
-                                 class="col-12 col-sm-6 col-lg-4">
-                                <div class="card h-100">
-                                    <div class="card-header">
-                                        User Information
-                                    </div>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Username: {{ card.username }}</li>
-                                        <li class="list-group-item">Password: {{ card.password }}</li>
-                                        <li class="list-group-item">Australian Resident: {{ card.isAustralian ? 'Yes' : 'No' }}</li>
-                                        <li class="list-group-item">Gender: {{ card.gender }}</li>
-                                        <li class="list-group-item">Reason: {{ card.reason }}</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row mt-5" v-if="submittedCards.length">
+                    <DataTable :value="submittedCards" stripedRows class="p-datatable-sm">
+                        <Column field="username" header="Username"></Column>
+                        <Column field="password" header="Password"></Column>
+                        <Column field="isAustralian" header="Australian Resident">
+                            <template #body="slotProps">
+                                {{ slotProps.data.isAustralian }}
+                            </template>
+                        </Column>
+                        <Column field="gender" header="Gender"></Column>
+                        <Column field="reason" header="Reason"></Column>
+                    </DataTable>
                 </div>
 
             </div>
@@ -90,7 +82,9 @@
 
 <script setup>
 import { ref } from 'vue';
-  
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
 const formData = ref({
     username: '',
     password: '',
@@ -109,7 +103,11 @@ const submitForm = () => {
     validateReason(true);
 
     if (!errors.value.username && !errors.value.password && !errors.value.isAustralian && !errors.value.gender && !errors.value.reason) {
-        submittedCards.value.push({ ...formData.value });
+        submittedCards.value.push({ 
+            ...formData.value,
+            id: Date.now(),
+            submittedAt: new Date().toISOString()
+         });
         clearForm();
     }
 
@@ -219,5 +217,21 @@ const validateReason = (blur) => {
 }
 .list-group-item {
     padding: 10px;
+}
+
+:deep(.p-datatable) {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+:deep(.p-datatable-header) {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+:deep(.p-datatable thead th) {
+    background-color: #678dde;
+    color: white;
+    font-weight: 600;
 }
 </style>
